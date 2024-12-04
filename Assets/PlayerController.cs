@@ -11,6 +11,10 @@ public class PlayerController : MonoBehaviour
     private Animator animator; // Animator component reference
     private Vector2 spawnPoint; // Spawn point for respawning
 
+    // Checkpoint variables
+    private static Vector2 lastCheckpoint; // Store the last checkpoint position
+    private static bool checkpointActive; // Check if the checkpoint is active
+
     // Animator parameters
     private static readonly int IsRunning = Animator.StringToHash("isRunning");
     private static readonly int IsJumping = Animator.StringToHash("isJumping");
@@ -22,6 +26,8 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>(); // Get the Animator component
         currentHealth = maxHealth; // Set current health to max health
         spawnPoint = transform.position; // Set spawn point to current position
+        lastCheckpoint = spawnPoint; // Initialize last checkpoint to spawn point
+        checkpointActive = false; // Initialize checkpoint as inactive
     }
 
     void Update()
@@ -105,7 +111,17 @@ public class PlayerController : MonoBehaviour
 
     private void Respawn()
     {
-        transform.position = spawnPoint; // Reset position to spawn point
+        transform.position = lastCheckpoint; // Reset position to last checkpoint
         currentHealth = maxHealth; // Reset health to max health
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Checkpoint")) // Check if the player has entered a checkpoint
+        {
+            lastCheckpoint = transform.position; // Update the last checkpoint position
+            checkpointActive = true; // Mark the checkpoint as active
+            Debug.Log("Checkpoint activated!"); // Optional: Debug message for checkpoint activation
+        }
     }
 }
